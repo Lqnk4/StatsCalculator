@@ -32,8 +32,14 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
 
     /**
      * Data is always sorted, method exists for no reason
+     * @param data data to be sorted
+     * @return sorted Array
      */
-    public void sortData() {}
+    public double[] sortData(double[] data) {
+        double[] newArr = data;
+        Arrays.sort(newArr);
+        return newArr;
+    }
 
     /**
      * @return maximum of the data
