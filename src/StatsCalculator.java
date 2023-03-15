@@ -19,7 +19,7 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
      * Creates a new StatsCalculator
      * @param values data
      */
-    public StatsCalculator(double[] values) {
+    public StatsCalculator(double... values) {
         this(values, Arrays.stream(values).sorted().toArray(), Util.findOutliers(Arrays.stream(values).sorted().toArray()));
     }
 
@@ -36,9 +36,8 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
      * @return sorted Array
      */
     public double[] sortData(double[] data) {
-        double[] newArr = data;
-        Arrays.sort(newArr);
-        return newArr;
+        Arrays.sort(data);
+        return data;
     }
 
     /**
