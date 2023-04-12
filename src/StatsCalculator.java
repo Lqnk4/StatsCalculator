@@ -32,12 +32,9 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
 
     /**
      * Data is always sorted, method exists for no reason
-     * @param data data to be sorted
-     * @return sorted Array
      */
-    public double[] sortData(double[] data) {
-        Arrays.sort(data);
-        return data;
+    public void sortData() {
+        Arrays.sort(values);
     }
 
     /**
@@ -60,7 +57,7 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
      * @return first quartile
      */
     public double calculateFirstQuartile() {
-        return Util.quartile(sortedValues, 25);
+        return Util.Quartiles(sortedValues)[0];
     }
 
     /**
@@ -68,7 +65,7 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
      * @return third quartile
      */
     public double calculateThirdQuartile() {
-        return Util.quartile(sortedValues, 75);
+        return Util.Quartiles(sortedValues)[2];
     }
 
     /**
@@ -87,7 +84,7 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
         return Arrays.stream(values).sum();
     }
 
-    public double calculateAverage() {
+    public double calculateMean() {
         return Arrays.stream(values).average().getAsDouble();
     }
 
@@ -130,14 +127,27 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
     private static class Util{
         /**
          * Retrive the quartile value from a **sorted** array
-         * .
-         * @param values THe array of data
-         * @param lowerPercent The percent cut off. For the lower quartile use 25,
+         * <p>
          *      for the upper-quartile use 75
          * @return Quartile value
          */
-        private static double quartile(double[] values, double lowerPercent) {
-            return values[(int) Math.round(values.length * lowerPercent / 100)];
+        public static double[] Quartiles(double[] val) {
+            double[] ans = new double[3];
+
+            for (int quartileType = 1; quartileType < 4; quartileType++) {
+                float length = val.length + 1;
+                double quartile;
+                float newArraySize = (length * ((float) (quartileType) * 25 / 100)) - 1;
+                Arrays.sort(val);
+                if (newArraySize % 1 == 0) {
+                    quartile = val[(int) (newArraySize)];
+                } else {
+                    int newArraySize1 = (int) (newArraySize);
+                    quartile = (val[newArraySize1] + val[newArraySize1 + 1]) / 2;
+                }
+                ans[quartileType - 1] =  quartile;
+            }
+            return ans;
         }
 
         /**
@@ -146,7 +156,7 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
          * @return median
          */
         private static double median(double[] values) {
-            return values.length % 2 == 0 ? values[values.length / 2] : (values[(values.length - 1) / 2] + values[(values.length + 1)/2])/2;
+            return values.length % 2 == 0 ? (values[(values.length - 1) / 2] + values[(values.length + 1)/2])/2: values[values.length / 2];
 
         }
 
@@ -156,8 +166,8 @@ public record StatsCalculator(double[] values, double[] sortedValues, List<Doubl
          * @return List of Outliers
          */
         private static List<Double> findOutliers(double[] sortedValues) {
-            double onePointFiveIQR = quartile(sortedValues, 75)-quartile(sortedValues, 25) * 1.5;
-            return Arrays.stream(sortedValues).filter((d) -> quartile(sortedValues, 25) - d > onePointFiveIQR || d - quartile(sortedValues, 75) > onePointFiveIQR).boxed().toList();
+            double onePointFiveIQR = Quartiles(sortedValues)[2]-Quartiles(sortedValues)[1] * 1.5;
+            return Arrays.stream(sortedValues).filter((d) -> Quartiles(sortedValues)[0] - d > onePointFiveIQR || d - Quartiles(sortedValues)[2] > onePointFiveIQR).boxed().toList();
         }
 
         /**
